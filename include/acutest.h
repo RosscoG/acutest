@@ -1544,7 +1544,7 @@ acutest_help_(void)
     printf("                          2 ... As 1 and failed conditions (this is default)\n");
     printf("                          3 ... As 1 and all conditions (and extended summary)\n");
     printf("  -q, --quiet           Same as --verbose=0\n");
-    printf("      --max-msg=NUMBER  Set output limit to NUMBER\n");
+    printf("      --max-msg=NUMBER  Set message output limit to NUMBER (greater than 0)\n");
     printf("      --color[=WHEN]    Enable colorized output\n");
     printf("                          (WHEN is one of 'auto', 'always', 'never')\n");
     printf("      --no-color        Same as --color=never\n");
@@ -1573,7 +1573,7 @@ static const ACUTEST_CMDLINE_OPTION_ acutest_cmdline_options_[] = {
     { 'l',  "list",         'l', 0 },
     { 'v',  "verbose",      'v', ACUTEST_CMDLINE_OPTFLAG_OPTIONALARG_ },
     { 'q',  "quiet",        'q', 0 },
-    {  0,   "max-msg",      'm', ACUTEST_CMDLINE_OPTFLAG_OPTIONALARG_ },
+    {  0,   "max-msg",      'm', ACUTEST_CMDLINE_OPTFLAG_REQUIREDARG_ },
     {  0,   "color",        'c', ACUTEST_CMDLINE_OPTFLAG_OPTIONALARG_ },
     {  0,   "no-color",     'C', 0 },
     { 'h',  "help",         'h', 0 },
@@ -1646,7 +1646,12 @@ acutest_cmdline_callback_(int id, const char* arg)
             break;
 
         case 'm':
-            acutest_max_msg_ = (arg != NULL ? atoi(arg) : acutest_max_msg_);
+            acutest_max_msg_ = atoi(arg);
+            if (acutest_max_msg_ < 1) {
+                fprintf(stderr, "%s: Argument error '%s' for option --max-msg.\n", acutest_argv0_, arg);
+                fprintf(stderr, "Try '%s --help' for more information.\n", acutest_argv0_);
+                acutest_exit_(2);
+            }
             break;
 
         case 'c':
